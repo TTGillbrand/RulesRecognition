@@ -2,11 +2,19 @@ import javax.sound.sampled.*;
 import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 public class AudioRecorder {
 
     private TargetDataLine targetLine;
     private final AtomicBoolean recording = new AtomicBoolean(false);
+
     private Thread recordingThread;
+    private Thread recognizerThread;
+
+    private final BlockingQueue<byte[]> audioQueue = new LinkedBlockingQueue<>();
 
 
     /** start Recording
@@ -14,8 +22,7 @@ public class AudioRecorder {
      * outputFilePath - path to the file we are writing the recording to(wav)
      * format - the specfic audio format that we are using
     **/
-    public void startRecording(String outputFilePath, AudioFormat format)
-        throws LineUnavailableException{
+    public void startRecording(AudioFormat format) throws LineUnavailableException{
         if (recording.get()) {
             throw new LineUnavailableException("Recording already started");
         }
@@ -34,34 +41,34 @@ public class AudioRecorder {
 
         recording.set(true);
 
-        recordingThread = new Thread(() -> {
-            try {
-                recordAudio(outputFilePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
+        recordingThread = new Thread(this::captureAudio);
         recordingThread.start();
 
+        recognizerThread = new Thread(() -> {
+            while (recording.get()) {
+                try {
+                    byte[] audio = audioQueue.take();
+
+                    recognizer.process(audio);
+                }
+            }
+        })
     }
 
-    private void recordAudio(String outputFilePath) throws IOException {
-        File outputFile = new File(outputFilePath);
-        try (AudioInputStream audioStream = new AudioInputStream(targetLine)){
-            AudioSystem.write(
-                    audioStream,
-                    AudioFileFormat.Type.WAVE,//indicating a .wav file
-                    /*Alternatives:
-                    * AU
-                    * AIFF
-                    * AIFC
-                    * SND
-                    * */
-                    outputFile
-            );
+    private void captureAudio(){
+        byte[] buffer = new byte[4096];
+        while (recording.get()) {
+            int bytesRead = targetLine.read(buffer, 0, buffer.length);
+            //reads audio information to a buffer variable, that is copied to our queue
+            if (bytesRead > 0) {
+                byte[] chunk = Arrays.copyOfRange(buffer, 0, bytesRead);
+
+                audioQueue.add(chunk);
+            }
         }
     }
+
+
 
     public void stopRecording() {
         if(!recording.get()) {
@@ -89,5 +96,19 @@ public class AudioRecorder {
     public boolean isRecording() {
         return recording.get();
     }
+
+    public TargetDataLine getTargetLine() {
+        return targetLine;
+    }
+
+//    public AudioInputStream getAudioInputStream(){
+//        return AudioInputStream(targetLine);
+//    }
+
+    public BlockingQueue<byte[]> getAudioQueue() {
+        return audioQueue;
+    }
+
+
 
 }

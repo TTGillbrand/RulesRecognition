@@ -53,7 +53,7 @@ public class RecorderGUI extends Frame{
                 if (isRecording) {
                     recorder.stopRecording();
                 } else {
-                    recorder.startRecording("recording.wav", audioFormat);
+                    recorder.startRecording(audioFormat);
                 }
             }  catch (LineUnavailableException ex) {
                 ex.printStackTrace();
