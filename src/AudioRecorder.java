@@ -47,12 +47,26 @@ public class AudioRecorder {
         recognizerThread = new Thread(() -> {
             while (recording.get()) {
                 try {
-                    byte[] audio = audioQueue.take();
+                    byte[] audio = null;
+                    try {
+                        audio = audioQueue.take();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
 
                     recognizer.process(audio);
                 }
             }
-        })
+        });
+        recognizerThread.start();
+
+        if(recognizerThread != null){
+            try {
+                recognizerThread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void captureAudio(){
