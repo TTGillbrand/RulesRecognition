@@ -1,3 +1,5 @@
+package rulesrecognition;
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.awt.*;
@@ -9,7 +11,7 @@ import java.util.ArrayList;
 public class RecorderGUI extends Frame{
     private Label title;
     private Button recordButton;
-    private Label subsLabel;
+    private TextField subsLabel;
     private TextField log;
     boolean isRecording = false;
     public AudioFormat audioFormat;
@@ -18,8 +20,8 @@ public class RecorderGUI extends Frame{
     ArrayList<String> subtitles = new ArrayList<>();
 
     public RecorderGUI() {
-        //test test test
-        
+        subtitles.add("hlululululh");
+        subtitles.add("hlululululh 2");
         setLayout(new FlowLayout());
 
         title = new Label("Rule Recognizer");
@@ -28,8 +30,11 @@ public class RecorderGUI extends Frame{
         recordButton = new Button("Record");
         add(recordButton);
 
-        subsLabel = new Label(convertSubtitlesToString(subtitles));
+        subsLabel = new TextField(convertSubtitlesToString(subtitles), 50);
+        subsLabel.setEditable(false);
         add(subsLabel);
+
+
 
         recordButton.addActionListener(new BtnRecordToggle());
 
@@ -61,6 +66,7 @@ public class RecorderGUI extends Frame{
     private String convertSubtitlesToString(ArrayList<String> subtitles){
         String combinedString = "";
         combinedString = String.join(" ", subtitles);
+        //System.out.println("asdasdasdasdas");
         return combinedString;
     }
 

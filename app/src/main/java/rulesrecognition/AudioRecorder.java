@@ -1,10 +1,15 @@
-import javax.sound.sampled.*;
-import java.io.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+package rulesrecognition;
 
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.TargetDataLine;
 
 public class AudioRecorder {
 
@@ -45,17 +50,18 @@ public class AudioRecorder {
         //the recording will be done in a seperate thread so that other process can be run in the meantime
         recordingThread = new Thread(this::captureAudio);
         recordingThread.start();
-        Decoder decoder = new Decoder();
+
+
+        Decoder decoder = new Decoder(
+            audioQueue,
+            recording,
+            "app/models/vosk-model-small-en-us-0.15",
+            format.getSampleRate()
+        );
         decoderThread = new Thread(decoder);
         decoderThread.start();
 
-        if(decoderThread != null){
-            try {
-                decoderThread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        
     }
 
     private void captureAudio(){
@@ -86,13 +92,15 @@ public class AudioRecorder {
         }
 
 
-        if (recordingThread != null) {
-            //catching the currently running thread
-            try {
+        try {
+            if(recordingThread != null){
                 recordingThread.join();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
+            if(decoderThread != null){
+                decoderThread.join();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

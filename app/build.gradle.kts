@@ -20,7 +20,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.75'
+    implementation("com.alphacephei:vosk:0.3.45")
 
     // This dependency is used by the application.
     implementation(libs.guava)
@@ -35,7 +35,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "rulesrecognition.App"
+    mainClass = "rulesrecognition.Main"
 }
 
 tasks.named<Test>("test") {
