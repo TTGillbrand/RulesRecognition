@@ -18,7 +18,7 @@ public class RecorderGUI extends Frame{
     ArrayList<String> subtitles = new ArrayList<>();
 
     public RecorderGUI() {
-        
+        //test test test
         
         setLayout(new FlowLayout());
 
