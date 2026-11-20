@@ -1,11 +1,10 @@
 package rulesrecognition;
 
 import javax.sound.sampled.*;
-import java.io.File;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.Thread.*;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class RecorderGUI extends Frame{
@@ -45,19 +44,21 @@ public class RecorderGUI extends Frame{
         setTitle("Recognizer");
         setSize(500, 500);
 
+        
+
         setVisible(true);
 
         /*-----------------------------*/
 
          audioFormat = new AudioFormat
                 (
-                        AudioFormat.Encoding.PCM_SIGNED,
-                        44100.0f,
-                        16,
-                        2,
-                        4,
-                        441100.0f,
-                        true);
+                        AudioFormat.Encoding.PCM_SIGNED,//encoding type
+                        16000.0f,//sample rate
+                        16,//sample size(bits)
+                        1,//# channels
+                        2,//frame size
+                        16000.0f,//frame rate
+                        false);//endianess(little)
          recorder = new AudioRecorder();
 
 
@@ -91,6 +92,11 @@ public class RecorderGUI extends Frame{
             log.setText(isRecording ? "Recording" + "\n" : "Stopped Recording" + "\n");
         }
     }
+
+//     @Override 
+//     void addWindowListener(WindowAdapter w1){
+//         super.addWindowListener(WindowAdapter w1);
+//     }
 }
 
 

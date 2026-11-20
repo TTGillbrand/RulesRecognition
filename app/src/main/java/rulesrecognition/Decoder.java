@@ -26,34 +26,17 @@ public class Decoder implements Runnable {
     //decode Audio
     @Override 
     public void run(){
-        //System.out.println("holy fuck L");
-
-
-File modelDirectory = new File(modelPath);
-
-System.out.println("Working directory: "
-        + System.getProperty("user.dir"));
-
-System.out.println("Model absolute path: "
-        + modelDirectory.getAbsolutePath());
-
-System.out.println("Model directory exists: "
-        + modelDirectory.exists());
-
-System.out.println("Is directory: "
-        + modelDirectory.isDirectory());
-
         try (Model model = new Model(modelPath);
             Recognizer recognizer = new Recognizer(model, sampleRate)){
             System.out.println("Vosk started");
 
             while (recording.get() || !audioQueue.isEmpty()){
                 byte[] audioData = audioQueue.poll(100, TimeUnit.MILLISECONDS);
-
-                if(audioQueue == null){
+                System.out.println("queueSize: " + audioQueue.size());
+                
+                if(audioData == null){
                     continue;
                 }
-
 
                 if(recognizer.acceptWaveForm(audioData, audioData.length)){
                     String result = recognizer.getResult();
@@ -75,4 +58,8 @@ System.out.println("Is directory: "
             e.printStackTrace();
         }
     }
+    private static String[] jsonToStrings(String json){
+        return json.split(" ");
+    }
+
 }
