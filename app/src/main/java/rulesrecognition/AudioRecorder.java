@@ -27,7 +27,7 @@ public class AudioRecorder {
      * outputFilePath - path to the file we are writing the recording to(wav)
      * format - the specfic audio format that we are using
     **/
-    public void startRecording(AudioFormat format) throws LineUnavailableException{
+    public void startRecording(AudioFormat format, RecorderGUI recorderGUI) throws LineUnavailableException{
         if (recording.get()) {
             throw new LineUnavailableException("Recording already started");
         }
@@ -56,7 +56,8 @@ public class AudioRecorder {
             audioQueue,
             recording,
             "app/models/vosk-model-small-en-us-0.15",
-            format.getSampleRate()
+            format.getSampleRate(),
+            recorderGUI
         );
         decoderThread = new Thread(decoder);
         decoderThread.start();

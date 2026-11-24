@@ -71,8 +71,16 @@ public class RecorderGUI extends Frame{
         return combinedString;
     }
 
-    public void addToSubs(String addition){
-        subtitles.add(addition);
+    public void addToSubs(String[] addition){
+        for(String txt : addition){
+            subtitles.add(txt);
+            if(subtitles.size() > 25){
+                subtitles.remove(0);
+            }
+            subsLabel.setText(convertSubtitlesToString(subtitles));
+        }
+        System.out.println("Added to Subtitles");
+        this.revalidate();
     }
 
     private class BtnRecordToggle implements ActionListener {
@@ -82,7 +90,7 @@ public class RecorderGUI extends Frame{
                 if (isRecording) {
                     recorder.stopRecording();
                 } else {
-                    recorder.startRecording(audioFormat);
+                    recorder.startRecording(audioFormat, RecorderGUI.this);
                 }
             }  catch (LineUnavailableException ex) {
                 ex.printStackTrace();
